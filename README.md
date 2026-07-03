@@ -1,12 +1,18 @@
-**Live Demo:** https://getskillforge.org
-
-
 # SkillForge
 
-**SkillForge** is an AI-powered curriculum generation platform that turns any topic into a personalized learning roadmap.
-Give it a topic and experience level, and SkillForge generates a structured curriculum with modules, objectives, exercises, mini-projects, and estimated study hours.
+**SkillForge** is an AI-powered curriculum generation platform that turns any topic into a personalized learning roadmap with modules, objectives, exercises, projects, and estimated study hours.
 
-Built as a full-stack portfolio project, SkillForge combines a React frontend, FastAPI backend, PostgreSQL persistence, Google OAuth authentication, and a multi-stage AI curriculum generation pipeline powered by Gemini.
+**Live Demo:** https://getskillforge.org
+
+Unlike a one-shot chatbot response, SkillForge uses a multi-stage **Planner → Critic → Architect** pipeline to generate more structured, reviewable curricula and persist them per user.
+
+## Highlights
+
+* Generate personalized learning roadmaps from any topic and experience level
+* Multi-stage curriculum generation pipeline for higher-quality outputs
+* Google OAuth + JWT authentication
+* Persistent curriculum history with save / unsave support
+* Full-stack production deployment with React, FastAPI, PostgreSQL, Docker, and Nginx
 
 ---
 
@@ -35,7 +41,7 @@ Built as a full-stack portfolio project, SkillForge combines a React frontend, F
 
 ## How It Works
 
-SkillForge uses a multi-stage AI pipeline to generate better curricula than a single one-shot prompt.
+SkillForge uses a multi-stage AI pipeline to generate more structured curricula than a single one-shot prompt.
 
 ### Curriculum Generation Pipeline
 
@@ -45,7 +51,7 @@ SkillForge uses a multi-stage AI pipeline to generate better curricula than a si
 * **Critic** reviews the plan and identifies weaknesses, gaps, or areas to improve
 * **Architect** produces the final curriculum blueprint
 
-The result is a curriculum designed to feel more intentional and structured than a raw chatbot response.
+The result is a curriculum designed to feel more intentional and reviewable than a raw chatbot response.
 
 ---
 
@@ -92,13 +98,13 @@ The result is a curriculum designed to feel more intentional and structured than
 SkillForge is a full-stack application with three core services:
 
 * **Frontend** – React + TypeScript SPA served behind Nginx
-* **Backend** – FastAPI API responsible for auth, curriculum generation, and persistence
+* **Backend** – FastAPI API responsible for authentication, curriculum generation, and persistence
 * **Database** – PostgreSQL for users, curriculum history, saved state, and generation tracking
 
 ### Auth Flow
 
 1. User signs in with Google
-2. Frontend sends Google credential to the backend
+2. Frontend sends the Google credential to the backend
 3. Backend verifies the Google ID token
 4. Backend finds or creates the user in PostgreSQL
 5. Backend issues a JWT
@@ -142,20 +148,111 @@ Example topics you might generate a roadmap for:
 SkillForge/
 ├── backend/
 │   ├── api/
-│   ├── llm/
-│   ├── prompts/
-│   ├── services/
+│   │   └── routes/
+│   │       ├── __init__.py
+│   │       ├── auth.py
+│   │       └── curriculums.py
 │   ├── database.py
+│   ├── Dockerfile
+│   ├── llm/
+│   │   ├── __init__.py
+│   │   ├── base.py
+│   │   └── gemini.py
+│   ├── migrations/
+│   │   └── 001_add_saved_column.sql
+│   ├── prompts/
+│   │   ├── __init__.py
+│   │   ├── architect.txt
+│   │   ├── critic.txt
+│   │   └── planner.txt
 │   ├── requirements.txt
-│   └── Dockerfile
-├── frontend/
-│   ├── src/
-│   ├── nginx.conf
-│   ├── package.json
-│   └── Dockerfile
+│   ├── schema.sql
+│   ├── schemas/
+│   │   ├── critic.py
+│   │   ├── curriculum.py
+│   │   └── planner.py
+│   └── services/
+│       ├── __init__.py
+│       ├── architect.py
+│       ├── critic.py
+│       └── planner.py
 ├── docker-compose.yml
+├── frontend/
+│   ├── Dockerfile
+│   ├── index.html
+│   ├── nginx.conf
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── Skill_Forge_Logo.png
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── components/
+│   │   │   ├── curriculum/
+│   │   │   │   ├── CurriculumResult.tsx
+│   │   │   │   ├── CurriculumSkeleton.tsx
+│   │   │   │   ├── GenerateForm.tsx
+│   │   │   │   ├── HistoryItem.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── ModuleCard.tsx
+│   │   │   ├── layout/
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── Sidebar.tsx
+│   │   │   │   └── Topbar.tsx
+│   │   │   └── ui/
+│   │   │       ├── Badge.tsx
+│   │   │       ├── Button.tsx
+│   │   │       ├── Card.tsx
+│   │   │       ├── EmptyState.tsx
+│   │   │       ├── ErrorBanner.tsx
+│   │   │       ├── index.ts
+│   │   │       ├── LoginButton.tsx
+│   │   │       ├── StatCard.tsx
+│   │   │       └── Toggle.tsx
+│   │   ├── data/
+│   │   ├── hooks/
+│   │   │   └── useAppState.ts
+│   │   ├── index.css
+│   │   ├── lib/
+│   │   │   ├── api.ts
+│   │   │   ├── auth.ts
+│   │   │   └── utils.ts
+│   │   ├── main.tsx
+│   │   ├── types/
+│   │   │   └── index.ts
+│   │   ├── views/
+│   │   │   ├── DashboardView.tsx
+│   │   │   ├── HistoryView.tsx
+│   │   │   ├── index.ts
+│   │   │   ├── LoginView.css
+│   │   │   ├── LoginView.tsx
+│   │   │   ├── SavedView.tsx
+│   │   │   └── SettingsView.tsx
+│   │   └── vite-env.d.ts
+│   ├── tailwind.config.js
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
+├── LICENSE
 └── README.md
 ```
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/Abhinav-Pollepalli/SkillForge.git
+cd SkillForge
+
+cp .env.example .env
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+docker compose up --build
+```
+
+This will start the PostgreSQL database, FastAPI backend, and React frontend.
 
 ---
 
@@ -229,27 +326,7 @@ This starts:
 * **FastAPI backend**
 * **React frontend served through Nginx**
 
-Once running, the app should be available through the frontend service.
-
----
-
-## Backend API Notes
-
-The backend currently serves the FastAPI app from:
-
-```python
-backend.api.routes.curriculums:app
-```
-
-The API handles:
-
-* Google OAuth authentication
-* JWT issuance / verification
-* curriculum generation
-* curriculum history retrieval
-* save / unsave operations
-* delete / delete-all operations
-* per-user generation tracking
+Once the containers are up, the frontend is served through Nginx and the backend is available behind the `/api` reverse proxy.
 
 ---
 
